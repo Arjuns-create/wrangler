@@ -175,6 +175,67 @@ rates below are specified as *records/second*.
 | High (167 Directives) |      426      | 127,946,398 |  82,677,845,324 | 106,367.27 |
 | High (167 Directives) |      426      | 511,785,592 | 330,711,381,296 | 105,768.93 |
 
+## Byte Size and Time Duration Parsers
+
+The Wrangler library now includes built-in support for parsing and aggregating byte sizes and time durations. This feature allows you to work with data containing size values (e.g., "10KB", "1.5MB") and time intervals (e.g., "100ms", "5s", "2h") more easily.
+
+### Supported Units
+
+#### Byte Size Units
+- B (Bytes)
+- KB/K (Kilobytes)
+- MB/M (Megabytes)
+- GB/G (Gigabytes)
+- TB/T (Terabytes)
+- PB/P (Petabytes)
+
+#### Time Duration Units
+- ms (Milliseconds)
+- s (Seconds)
+- m (Minutes)
+- h (Hours)
+- d (Days)
+
+### Using the Aggregate Stats Directive
+
+The `aggregate-stats` directive allows you to calculate totals and statistics for columns containing byte sizes and time durations.
+
+#### Syntax
+```
+aggregate-stats :size_column :time_column total_size_column total_time_column [output_size_unit] [output_time_unit]
+```
+
+#### Parameters
+- `size_column`: Source column containing byte sizes
+- `time_column`: Source column containing time durations
+- `total_size_column`: Target column for the total size
+- `total_time_column`: Target column for the total time
+- `output_size_unit` (optional): Desired unit for size output (default: MB)
+- `output_time_unit` (optional): Desired unit for time output (default: s)
+
+#### Example
+```
+# Input data:
+# | size      | time     |
+# |-----------|----------|
+# | "1.5MB"   | "500ms"  |
+# | "2.5GB"   | "2m"     |
+
+# Directive:
+aggregate-stats :size :time total_size total_time GB s
+
+# Output:
+# | total_size | total_time |
+# |------------|------------|
+# | 2.501465   | 120.5     |
+```
+
+The example above:
+1. Reads byte sizes from the "size" column and time durations from the "time" column
+2. Converts all sizes to bytes and all times to milliseconds internally
+3. Sums the values
+4. Converts the totals to the requested output units (GB and seconds)
+5. Stores the results in "total_size" and "total_time" columns
 
 ## Contact
 
